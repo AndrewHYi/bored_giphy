@@ -1,0 +1,23 @@
+<h1 id="notice"></h1>
+
+<form id="giphy-form" method="POST" action="/process">
+  <label for="ttt"><b>Text to giphy-ize:</b></label>
+  <br>
+
+  <textarea rows="40" cols="100" id="ttt" name="text" form="giphy-form" placeholder="Enter text here..."></textarea>
+  <br>
+
+  <input id="submit" type="submit" value="Submit">
+</form>
+
+
+<script>
+  var form = document.getElementById("giphy-form");
+  var submit = document.getElementById("submit");
+  var notice = document.getElementById("notice");
+  form.addEventListener("submit", function() {
+    submit.disabled = true;
+    notice.innerText = "Processing... wait a couple of seconds";
+    form.style.display = "none";
+  }, false);
+</script>

@@ -25,15 +25,16 @@ class StoryMaker
   MAX_WORD_GROUP_SIZE = 4 # search at most 4 words in giphy
   attr_accessor :text
 
-  def initialize(demo: false, filepath: nil)
-    @text = if demo
-      YAML.load_file("./examples.yml").fetch("examples").sample
-    else
+  def initialize(filepath: nil, text: nil, save_to_file: true)
+    @save_to_file = save_to_file
+    @text = if filepath
       File.open(filepath) { |f| f.read }
+    else
+      text
     end
   end
 
-  def compile!
+  def compile!(save_to_file: @save_to_file)
     template_html = File.open("./template.html", "r") { |f| f.read }
     story_contents_html = ""
 
@@ -56,9 +57,13 @@ class StoryMaker
 
     template_html.sub!(HTML_REPLACE_TEXT_STRING, story_contents_html)
 
-    Dir.mkdir "compiled" rescue nil
-    File.open("./compiled/index.html", "w") { |f| f.write template_html }
-    `open ./compiled/index.html`
+    if save_to_file
+      Dir.mkdir "compiled" rescue nil
+      File.open("./compiled/index.html", "w") { |f| f.write template_html }
+      `open ./compiled/index.html`
+    else
+      return template_html
+    end
   end
 
   private
