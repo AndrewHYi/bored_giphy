@@ -30,7 +30,14 @@ class SinatraApp < Sinatra::Base
   post "/process" do
     s = StoryMaker.new(text: params[:text].to_s[0..CHAR_LIMIT], save_to_file: false)
     uuid = SecureRandom.uuid
-    html = s.compile!
+    sharelink_url = "#{ENV['APP_URL']}/a/#{uuid}"
+    html = s.compile!(pre_html: %Q{
+      <div class="share-link-notice">
+        <p>Share this with friends!: <a href="sharelink_url">#{sharelink_url}</a> </p>
+        <br />
+        <br />
+      </div>
+    })
     set_sharelink(uuid: uuid, html: html)
     redirect "/a/#{uuid}"
   end

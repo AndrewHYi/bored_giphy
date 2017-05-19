@@ -3,12 +3,11 @@ require "httparty"
 
 class Giphy
 
-  API_KEY = "***REMOVED***"
   BASE_URL = "http://api.giphy.com/v1/gifs"
 
   def self.search(*words)
     search_words = words.join("+")
-    json = HTTParty.get("#{BASE_URL}/search?api_key=#{API_KEY}&q=#{search_words}").parsed_response
+    json = HTTParty.get("#{BASE_URL}/search?api_key=#{ENV['GIPHY_API_KEY']}&q=#{search_words}").parsed_response
   end
 
   def self.rando(*words)
@@ -22,6 +21,8 @@ end
 
 class StoryMaker
   HTML_REPLACE_TEXT_STRING = "<%= STORY_MAKER_REPLACE_ME %>"
+  PRE_HTML_REPLACE_TEXT_STRING = "<%= PRE_HTML %>"
+  POST_HTML_REPLACE_TEXT_STRING = "<%= POST_HTML %>"
   MAX_WORD_GROUP_SIZE = 4 # search at most 4 words in giphy
   attr_accessor :text
 
@@ -34,7 +35,7 @@ class StoryMaker
     end
   end
 
-  def compile!(save_to_file: @save_to_file)
+  def compile!(save_to_file: @save_to_file, pre_html: nil, post_html: nil)
     template_html = File.open("./template.html", "r") { |f| f.read }
     story_contents_html = ""
 
@@ -56,6 +57,8 @@ class StoryMaker
     end
 
     template_html.sub!(HTML_REPLACE_TEXT_STRING, story_contents_html)
+    template_html.sub!(PRE_HTML_REPLACE_TEXT_STRING, pre_html.to_s)
+    template_html.sub!(POST_HTML_REPLACE_TEXT_STRING, post_html.to_s)
 
     if save_to_file
       Dir.mkdir "compiled" rescue nil
